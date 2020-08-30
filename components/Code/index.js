@@ -10,7 +10,7 @@ import print from "./helpers/print";
 import show from "./helpers/show";
 
 const MonacoEditor = dynamic(() => import("react-monaco-editor"), {
-  	ssr: false,
+  ssr: false,
 });
 
 class Code extends React.PureComponent {
