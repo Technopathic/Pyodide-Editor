@@ -47,4 +47,6 @@ export default test
 We're using TextTestRunner in these pyodide tests so we can get the stdout 
 of the tests and store them in the testOutput variable.
 
+Someone better at Python than me could most likely write this test better. 
+
 */

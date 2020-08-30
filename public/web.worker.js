@@ -2,13 +2,13 @@ self.languagePluginUrl = 'https://pyodide.cdn.iodide.io/'
 importScripts('./pyodide/pyodide.js')
 
 languagePluginLoader.then(() => {
-    self.pyodide.loadPackage().then(() => {
-      	self.postMessage({init: true})
-    })
+	self.pyodide.loadPackage().then(() => {
+		self.postMessage({init: true})
+	})
 }) 
 
 var onmessage = function(e) {
-  	languagePluginLoader.then(() => {
+  languagePluginLoader.then(() => {
 		const data = e.data;
 		const useTest = data.useTest;
 		const usePlot = data.usePlot;
