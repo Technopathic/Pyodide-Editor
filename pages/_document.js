@@ -22,7 +22,10 @@ export default class MyDocument extends Document {
   render() {
     return (
       <html>
-        <Head />
+        <Head>
+          <link rel="preload" href="/pyodide/pyodide.js" as="script" crossorigin/>
+          <script src="/pyodide/pyodide.js" defer></script>
+        </Head>
         <body>
           <Main />
           <NextScript />

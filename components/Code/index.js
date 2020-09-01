@@ -30,12 +30,22 @@ class Code extends React.PureComponent {
 
   componentDidMount() {
     this.initExercise();
-    this.worker = new Worker("/web.worker.js");
-    this.worker.addEventListener("message", this.onWorkerMessage);
+    if(this.props.useWorker) {
+      this.worker = new Worker("/web.worker.js");
+      this.worker.addEventListener("message", this.onWorkerMessage);
+    } else {
+      languagePluginLoader.then(() => {
+        pyodide.loadPackage().then(() => {
+          this.onWorkerMessage({data: {init: true}})
+        })
+      }) 
+    }
   }
 
   componentWillUnmount() {
-    this.worker.terminate();
+    if(this.props.useWorker) {
+      this.worker.terminate();
+    } 
    }
 
   onWorkerMessage = (e) => {
@@ -53,6 +63,7 @@ class Code extends React.PureComponent {
         consoleError: "",
         testOutput: "",
       }, () => {
+
         if (useTest) {
           this.setState({
             testProcess: false,
@@ -188,10 +199,43 @@ ${usePlot ? this.props.plot : ""}
       usePlot
     }
 
-    this.worker.postMessage(data);
+    if(this.props.useWorker) {
+      this.worker.postMessage(data);
+    } else {
+      this.processCode({data})
+    }
 
     return;
   };
+
+  processCode = (e) => {
+    languagePluginLoader.then(() => {
+      const data = e.data;
+      const useTest = data.useTest;
+      const usePlot = data.usePlot;
+        pyodide.runPythonAsync(data.python)
+        .then(() => {
+          if(useTest) {
+            if(self.pyodide.globals.testOutput) {
+              this.onWorkerMessage({data:{ data: self.pyodide.globals.testOutput, useTest }})
+            }
+          } else if(usePlot) {
+            if(self.pyodide.globals.figureOutput) {
+              this.onWorkerMessage({data:{ data: self.pyodide.globals.figureOutput, usePlot }})
+            }
+          } else {
+            if(self.pyodide.globals.output) {
+              this.onWorkerMessage({data:{ data: self.pyodide.globals.output, useTest }})
+            }
+          }		
+        })
+        .catch(error => {
+          this.onWorkerMessage({ data: { data: { error } } })
+        })
+    }).catch(error => {
+      this.onWorkerMessage({ data: { data: { error } } })
+    })
+  }
     
 
 
@@ -242,10 +286,12 @@ ${usePlot ? this.props.plot : ""}
               <div css={Styles.editorButton} onClick={() => this.runCode(this.editor.getValue(), true)} style={{ margin: " 1rem 0.5rem" }}>
                 {this.state.codeProcess ? "Running..." : "Run"}
               </div>
-
-              <div css={Styles.editorButton} onClick={() => this.runCode(this.editor.getValue(), false, true)} style={{ margin: " 1rem 0.5rem" }}>
-                {this.state.testProcess ? "Testing..." : "Test"}
-              </div>
+              
+              {this.props.test &&
+                <div css={Styles.editorButton} onClick={() => this.runCode(this.editor.getValue(), false, true)} style={{ margin: " 1rem 0.5rem" }}>
+                  {this.state.testProcess ? "Testing..." : "Test"}
+                </div>
+              }
 
             </section>
 

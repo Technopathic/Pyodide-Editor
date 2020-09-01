@@ -13,7 +13,7 @@ var onmessage = function(e) {
     const useTest = data.useTest;
     const usePlot = data.usePlot;
       self.pyodide.runPythonAsync(data.python)
-      .then(() => {
+      .then(() => {     
         if(useTest) {
           if(self.pyodide.globals.testOutput) {
             self.postMessage({data: self.pyodide.globals.testOutput, useTest })

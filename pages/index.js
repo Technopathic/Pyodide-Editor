@@ -3,10 +3,14 @@ import Code from '../components/Code'
 import main from '../exampleData/main.js'
 import test from '../exampleData/test.js'
 import plot from '../exampleData/plot.js'
+import input from '../exampleData/input.js'
 
 const Home = () => (
   <div>
-    <Code code={main} test={test} plot={plot}/>
+    <Code code={main} test={test} plot={plot} useWorker={true}/>
+
+    <Code code={input} useWorker={false}/>
+
   </div>
 )
 
